@@ -272,8 +272,7 @@ def plot_distance(dists, ls=None, rmlargest=0., doplot=True,
     if title is not None: ax.set_title(title)
     if xaxtitle is not None: ax.set_xlabel(xaxtitle)
     if yaxtitle is not None: ax.set_ylabel(yaxtitle)
-    ax.legend()
-    plt.show()
+
     return (fig,ax)
 
 
@@ -294,7 +293,7 @@ def plot_loss(data, xlims=None,
     if title is not None: ax.set_title(title)
     if xaxtitle is not None: ax.set_xlabel(xaxtitle)
     if yaxtitle is not None: ax.set_ylabel(yaxtitle)
-    plt.show()
+   # plt.show()
     return (fig,ax)
     
 ### plot an array of mse values and get the mean and std value
@@ -327,14 +326,13 @@ def plot_score_dist( scores, labels, nbins=20, normalize=False,
         sighist = sighist/np.sum(sighist)
         bckhist = bckhist/np.sum(bckhist)
     (fig,ax) = plt.subplots()
-    ax.step(scoreax,sighist,color='g',label='signal',where='mid')
-    ax.step(scoreax,bckhist,color='r',label='background',where='mid')
+    ax.step(scoreax,sighist,color='y',label='signal/bad',where='mid')
+    ax.step(scoreax,bckhist,color='b',label='background/good',where='mid')
     ax.ticklabel_format(axis="x", style="sci", scilimits=(0,0))
     if title is not None: ax.set_title(title)
     if xaxtitle is not None: ax.set_xlabel(xaxtitle)
     if yaxtitle is not None: ax.set_ylabel(yaxtitle)
-    ax.legend()
-    plt.show()
+    
     return (fig,ax)
 
 def plot_fit_2d( points, fitfunc=None, logprob=False, onlycontour=False, xlims=5, ylims=5, onlypositive=False,

@@ -23,8 +23,46 @@ import json_utils
 importlib.reload(json_utils)
 
 
-
-
+def merge_ls(df):
+    numhistos = 0
+    lumi = df.get('fromlumi').get(0)
+    for i in range(len(df.get('hname'))):
+        if df.get('fromlumi').get(i) == lumi: numhistos = numhistos+1
+        else: break
+    list1 = []
+    #iterator = 0
+    for i in range(0, int((get_hist_values(df)[0].shape[0]-1)), numhistos):
+        listof = []
+        entries = 0
+        histo = ""
+        Xbins = 0
+        for j in range(0,numhistos,1):
+            if (j == 0 and df['hname'][j+i] != df['hname'][j+i+1]):
+                length = len(df['histo'][j+i])
+                histo = histo + (df['histo'][j+i])[0:length-1]
+                entries = entries + df['entries'][i+j]    
+                Xbins = Xbins + df['Xbins'][j+i] + 2 
+            if (j != 0 and df['hname'][j+i] != df['hname'][j+i+1]):
+                length = len(df['histo'][j+i])
+                histo = histo + (df['histo'][j+i])[0:length-1]
+                entries = entries + df['entries'][i+j]    
+                Xbins = Xbins + df['Xbins'][j+i] + 2     
+            elif (j!=0 and df['hname'][j+i] != df['hname'][j+i+1]):                          
+                length = len(df['histo'][j+i])
+                entries = entries + df['entries'][i+j]                
+                Xbins = Xbins + df['Xbins'][j+i] + 2 
+                if (j == numhistos-1):                
+                    histo = histo + ', ' + (df['histo'][j+i])[1:length]
+                else:               
+                    histo = histo + ', ' + (df['histo'][j+i])[1:length-1]
+                      
+        listof = [df['fromrun'][i], df['fromlumi'][i], 'combined', df['fromrun.1'][i], df['fromlumi.1'][i], df['metype'][i], 'combined', histo, entries, df['Xmax'][i], df['Xmin'][i], Xbins , df['Ymax'][i], 1, 1]
+        list1.append(listof)
+        #iterator = iterator + 1
+    newDF = pd.DataFrame(list1, columns = [ 'fromrun', 'fromlumi', 'hname', 'fromrun.1', 'fromlumi.1','metype', 'hname.1', 'histo', 'entries', 'Xmax', 'Xmin', 'Xbins', 'Ymax', 'Ymin', 'Ybins'])    
+    return newDF
+            
+          
 # getter and selector for histogram names 
 
 def get_histnames(df):
@@ -182,6 +220,8 @@ def get_hist_values(df):
     ls = np.zeros(len(df))
     runs = np.zeros(len(df))
     for i in range(len(df)):
+        nxbins = df.at[i,'Xbins']+2 # +2 for under- and overflow bins
+        vals = np.zeros((len(df),nxbins))
         hist = np.array(json.loads(df.at[i,'histo']))
         if dim==2: hist = hist.reshape((nybins,nxbins))
         vals[i,:] = hist

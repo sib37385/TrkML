@@ -202,7 +202,7 @@ def get_roc(scores, labels, mode='lin', npoints=100, doprint=False, doplot=True,
         if auc>0.99:
             auctext = '1 - '+'{:.3e}'.format(1-auc)
         ax.text(0.7,0.1,'AUC: '+auctext,transform=ax.transAxes)
-        plt.show()
+      #  plt.show()
         
     else:
         print('ERROR: mode not recognized: '+str(mode))
@@ -230,22 +230,30 @@ def get_confusion_matrix(scores, labels, wp):
     
     nsig = np.sum(labels)
     nback = np.sum(1-labels)
+    total = nsig + nback
+   
     
     # get confusion matrix entries
     tp = np.sum(np.where((labels==1) & (scores>wp),1,0))/nsig
     fp = np.sum(np.where((labels==0) & (scores>wp),1,0))/nback
     tn = 1-fp
     fn = 1-tp
+    accuracy = (np.sum(np.where((labels==1) & (scores>wp),1,0))+(np.sum(np.where((labels==0) & (scores<wp),1,0))))/total
+    misclass = (np.sum(np.where((labels==0) & (scores>wp),1,0)) + (np.sum(np.where((labels==1) & (scores<wp),1,0))))/total
+  
     cmat = np.array([[tp,fn],[fp,tn]])
     # general labels:
     #df_cm = pd.DataFrame(cmat, index = ['signal','background'],
     #              columns = ['predicted signal','predicted background'])
     # specific labels:
-    df_cm = pd.DataFrame(cmat, index = ['bad','good'],
-                  columns = ['predicted anomalous','predicted good'])
+    df_cm = pd.DataFrame(cmat, index = ['true bad','true good'],
+                  columns = ['predicted bad','predicted good'])
     #plt.figure(figsize = (10,7))
-    plt.figure()
+    
     sn.heatmap(df_cm, annot=True, cmap=plt.cm.Blues)
+    print("Accuracy:  ", accuracy)
+    print("misclassification rate:  ", misclass)
+   
     
 def get_confusion_matrix_from_hists(hists, labels, predicted_hists, msewp):
     ### plot a confusion matrix without manually calculating the scores

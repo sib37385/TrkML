@@ -34,6 +34,7 @@ def get_data_dirs(year='2017', eras=[], dim=1):
     # - era is a list containing a selection of era names
     #   (default empty list = all eras)
     # - dim is either 1 or 2 (for 1D or 2D plots)
+    #/eos/user/j/jmhogan/TrackerDQM
     if(year=='2017' and len(eras)==0): eras = ['B','C','D','E','F']
     if(year=='2018' and len(eras)==0): eras = ['A','B','C','D']
     basedir = '/eos/project/c/cmsml4dc/ML_2020/UL'+year+'_Data/'
@@ -101,6 +102,26 @@ def read_and_merge_csv(csv_files, histnames=[], runnbs=[]):
     return df
 
 
+def merge_csv2(dataframe):
+    ### read and merge list of csv files into a single df
+    # csv_files is a list of paths to files to merge into a df
+    # histnames is a list of the types of histograms to keep (default: all)
+    # runnbs is a list of run numbers to keep (default: all)
+    df = dataframe
+    dflength = len(df)
+
+    for x in range(0,dflength,2):
+        length1 = len(df['histo'][x])
+        length2 = len(df['histo'][x+1])
+        string1 = df['histo'][x]
+        string2 = df['histo'][x+1]
+        df['histo'][x] = string1[0:length1-1] + ', '+ string2[1:length2] 
+        df.drop([x+1])
+        print(x)
+    df.sort_values(by=['fromrun','fromlumi'],inplace=True)
+    df.reset_index(drop=True,inplace=True)    
+    return df
+
 def write_skimmed_csv(histnames, year, eras=['all'], dim=1):
     ### read all available data for a given year/era and make a file per histogram type
     # input arguments:
@@ -130,6 +151,11 @@ def write_skimmed_csv(histnames, year, eras=['all'], dim=1):
             seldf = dfu.select_histnames(temp,[histname])
             histname = histname.replace(' ','_')
             seldf.to_csv('DF'+year+erasuffix+'_'+histname+'.csv')
+
+
+
+
+
 
 
 
