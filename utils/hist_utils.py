@@ -290,7 +290,7 @@ def preparedatafromdf(df, returnrunls=False, cropslices=None, rebinningfactor=No
 
     # preprocessing of the data: rebinning and normalizing
     (hist,runnbs,lsnbs) = dataframe_utils.get_hist_values(df)
-    if cropslices is not None:  hist = crophists(hist,cropslices)
+    if cropslices is not None: hist = crophists(hist,cropslices)
     if rebinningfactor is not None: hist = rebinhists(hist,rebinningfactor)
     if donormalize: hist = normalizehists(hist)
         
